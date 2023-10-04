@@ -9,12 +9,13 @@
 #include "FileIO.h"
 #include "CustomAssert.h"
 
-size_t line_len (const char *line);
+static size_t LineLength (const char *line);
+static ssize_t GetFileSize (const char *filename);
 
-void create_file_buffer (FILE_BUFFER *buffer, char *filename){
+void CreateFileBuffer (FileBuffer *buffer, char *filename) {
     PushLog (3);
 
-    buffer->buffer_size  = get_file_size (filename);
+    buffer->buffer_size  = GetFileSize (filename);
     custom_assert  (buffer->buffer_size > 0, invalid_value, (void)0);
 
     buffer->buffer = (char *) calloc ((size_t) buffer->buffer_size + 1, sizeof (char));
@@ -23,7 +24,7 @@ void create_file_buffer (FILE_BUFFER *buffer, char *filename){
     RETURN;
 }
 
-void destroy_file_buffer (FILE_BUFFER *buffer){
+void DestroyFileBuffer (FileBuffer *buffer) {
     PushLog (3);
 
     free (buffer->buffer);
@@ -31,7 +32,7 @@ void destroy_file_buffer (FILE_BUFFER *buffer){
     RETURN;
 }
 
-ssize_t get_file_size (const char *filename){
+static ssize_t GetFileSize (const char *filename) {
     PushLog (3);
 
     struct stat file_statistics;
@@ -41,7 +42,7 @@ ssize_t get_file_size (const char *filename){
     RETURN file_statistics.st_size;
 }
 
-void read_file (const char *filename, FILE_BUFFER *buffer){
+void ReadFile (const char *filename, FileBuffer *buffer) {
     PushLog (3);
 
     custom_assert (filename != NULL,        pointer_is_null,     (void)0);
@@ -60,23 +61,23 @@ void read_file (const char *filename, FILE_BUFFER *buffer){
     RETURN;
 }
 
-void read_file_lines (const char *filename, FILE_BUFFER *file_buffer, TEXT_BUFFER *text_buffer){
+void ReadFileLines (const char *filename, FileBuffer *file_buffer, textBuffer *text_buffer) {
     PushLog (2);
 
     custom_assert (file_buffer->buffer_size > 0, invalid_value,   (void)0);
     custom_assert (file_buffer->buffer != NULL,  pointer_is_null, (void)0);
 
-    read_file (filename,file_buffer);
+    ReadFile (filename,file_buffer);
 
-    text_buffer->line_count = split_buffer_to_lines (file_buffer->buffer, NULL);
-    text_buffer->lines = (TEXT_LINE *) calloc (text_buffer->line_count, sizeof (TEXT_LINE));
+    text_buffer->line_count = SplitBufferToLines (file_buffer->buffer, NULL);
+    text_buffer->lines = (TextLine *) calloc (text_buffer->line_count, sizeof (TextLine));
 
-    split_buffer_to_lines (file_buffer->buffer, text_buffer);
+    SplitBufferToLines (file_buffer->buffer, text_buffer);
 
     RETURN;
 }
 
-size_t split_buffer_to_lines (char *file_buffer, TEXT_BUFFER *text_buffer){
+size_t SplitBufferToLines (char *file_buffer, textBuffer *text_buffer) {
     PushLog (3);
 
     custom_assert (file_buffer != NULL, pointer_is_null, 0);
@@ -85,10 +86,10 @@ size_t split_buffer_to_lines (char *file_buffer, TEXT_BUFFER *text_buffer){
     char *previous_symbol = NULL;
     size_t current_line_index  = 0;
 
-    while (*current_symbol != '\0'){
-        if (text_buffer != NULL){
+    while (*current_symbol != '\0') {
+        if (text_buffer != NULL) {
             text_buffer->lines[current_line_index].pointer = current_symbol;
-            if (previous_symbol != NULL){
+            if (previous_symbol != NULL) {
                 text_buffer->lines[current_line_index - 1].length = (size_t) (current_symbol - previous_symbol - 1);
             }
             previous_symbol = current_symbol;
@@ -101,8 +102,8 @@ size_t split_buffer_to_lines (char *file_buffer, TEXT_BUFFER *text_buffer){
         current_symbol++;
     }
 
-    if (text_buffer != NULL){
-        text_buffer->lines[current_line_index - 1].length = line_len (previous_symbol);
+    if (text_buffer != NULL) {
+        text_buffer->lines[current_line_index - 1].length = LineLength (previous_symbol);
         text_buffer->line_count = current_line_index;
     }
 
@@ -111,36 +112,36 @@ size_t split_buffer_to_lines (char *file_buffer, TEXT_BUFFER *text_buffer){
 
 }
 
-void write_line(int file_descriptor, TEXT_LINE *line){
+void WriteLine(int file_descriptor, TextLine *line) {
     PushLog (3);
 
     custom_assert (line != NULL,        pointer_is_null, (void)0);
     custom_assert (file_descriptor > 0, invalid_value,   (void)0);
 
-    if (line->length == 0){
+    if (line->length == 0) {
         RETURN;
     }
 
-    write_buffer (file_descriptor, line->pointer, (ssize_t) line->length);
-    write_buffer (file_descriptor, "\n", 1);
+    WriteBuffer (file_descriptor, line->pointer, (ssize_t) line->length);
+    WriteBuffer (file_descriptor, "\n", 1);
 
     RETURN;
 }
 
-void write_lines (int file_descriptor, TEXT_BUFFER *lines){
+void WriteLines (int file_descriptor, textBuffer *lines) {
     PushLog (3);
 
     custom_assert (lines != NULL,       pointer_is_null, (void)0);
     custom_assert (file_descriptor > 0, invalid_value,   (void)0);
 
-    for (size_t line = 0; line < lines->line_count; line++){
-        write_line (file_descriptor, lines->lines + line);
+    for (size_t line = 0; line < lines->line_count; line++) {
+        WriteLine (file_descriptor, lines->lines + line);
     }
 
     RETURN;
 }
 
-void write_buffer (int file_descriptor, const char *buffer, ssize_t buffer_size){
+void WriteBuffer (int file_descriptor, const char *buffer, ssize_t buffer_size) {
     PushLog (3);
 
     custom_assert (buffer != NULL,      pointer_is_null, (void)0);
@@ -152,7 +153,7 @@ void write_buffer (int file_descriptor, const char *buffer, ssize_t buffer_size)
     RETURN;
 }
 
-int open_file_write (const char *filename){
+int OpenFileWrite (const char *filename) {
     PushLog (3);
 
     int file_descriptor = -1;
@@ -162,7 +163,7 @@ int open_file_write (const char *filename){
     RETURN file_descriptor;
 }
 
-void close_file (int file_descriptor){
+void CloseFile (int file_descriptor) {
     PushLog (4);
 
     custom_assert (close (file_descriptor) == 0, file_close_error, (void) 0);
@@ -170,14 +171,14 @@ void close_file (int file_descriptor){
     RETURN;
 }
 
-size_t line_len (const char *line){
+static size_t LineLength (const char *line) {
     PushLog (4);
 
     custom_assert (line != NULL, pointer_is_null, 0);
 
     size_t length = 0;
 
-    while (line [length] != '\0' && line [length] != '\n'){
+    while (line [length] != '\0' && line [length] != '\n') {
         length++;
     }
 

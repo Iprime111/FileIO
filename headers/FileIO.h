@@ -3,20 +3,19 @@
 
 #include "TextTypes.h"
 
-void create_file_buffer  (FILE_BUFFER *buffer, char *filename);
-void destroy_file_buffer (FILE_BUFFER *buffer);
+void CreateFileBuffer  (FileBuffer *buffer, char *filename);
+void DestroyFileBuffer (FileBuffer *buffer);
 
-ssize_t get_file_size (const char *filename);
-void read_file        (const char *filename, FILE_BUFFER *buffer);
-void read_file_lines  (const char *filename, FILE_BUFFER *file_buffer, TEXT_BUFFER *text_buffer);
+void ReadFile       (const char *filename, FileBuffer *buffer);
+void ReadFileLines  (const char *filename, FileBuffer *file_buffer, textBuffer *text_buffer);
 
-size_t split_buffer_to_lines (char *file_buffer, TEXT_BUFFER *text_buffer);
+size_t SplitBufferToLines (char *file_buffer, textBuffer *text_buffer);
 
-int open_file_write (const char *filename);
-void close_file (int file_descriptor);
+int OpenFileWrite (const char *filename);
+void CloseFile (int file_descriptor);
 
-void write_line(int file_descriptor, TEXT_LINE *line);
-void write_lines (int file_descriptor, TEXT_BUFFER *lines);
-void write_buffer (int file_descriptor, const char *buffer, ssize_t buffer_size);
+void WriteLine   (int file_descriptor, TextLine *line);
+void WriteLines  (int file_descriptor, textBuffer *lines);
+void WriteBuffer (int file_descriptor, const char *buffer, ssize_t buffer_size);
 
 #endif
