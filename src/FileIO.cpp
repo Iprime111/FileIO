@@ -61,7 +61,7 @@ void ReadFile (const char *filename, FileBuffer *buffer) {
     RETURN;
 }
 
-void ReadFileLines (const char *filename, FileBuffer *file_buffer, textBuffer *text_buffer) {
+void ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *text_buffer) {
     PushLog (2);
 
     custom_assert (file_buffer->buffer_size > 0, invalid_value,   (void)0);
@@ -77,7 +77,7 @@ void ReadFileLines (const char *filename, FileBuffer *file_buffer, textBuffer *t
     RETURN;
 }
 
-size_t SplitBufferToLines (char *file_buffer, textBuffer *text_buffer) {
+size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer) {
     PushLog (3);
 
     custom_assert (file_buffer != NULL, pointer_is_null, 0);
@@ -128,7 +128,7 @@ void WriteLine(int file_descriptor, TextLine *line) {
     RETURN;
 }
 
-void WriteLines (int file_descriptor, textBuffer *lines) {
+void WriteLines (int file_descriptor, TextBuffer *lines) {
     PushLog (3);
 
     custom_assert (lines != NULL,       pointer_is_null, (void)0);

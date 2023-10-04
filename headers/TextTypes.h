@@ -12,7 +12,7 @@ struct TextLine {
     size_t length;
 };
 
-struct textBuffer {
+struct TextBuffer {
     TextLine *lines;
     size_t line_count;
 };
