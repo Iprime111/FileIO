@@ -8,20 +8,25 @@
 
 #include "FileIO.h"
 #include "CustomAssert.h"
+#include "Logger.h"
 
 static size_t LineLength (const char *line);
 static ssize_t GetFileSize (const char *filename);
 
-void CreateFileBuffer (FileBuffer *buffer, char *filename) {
+bool CreateFileBuffer (FileBuffer *buffer, char *filename) {
     PushLog (3);
 
     buffer->buffer_size  = GetFileSize (filename);
-    custom_assert  (buffer->buffer_size > 0, invalid_value, (void)0);
+    if (buffer->buffer_size <= 0) {
+        RETURN false;
+    }
 
     buffer->buffer = (char *) calloc ((size_t) buffer->buffer_size + 1, sizeof (char));
-    custom_assert (buffer->buffer != NULL, pointer_is_null, (void)0);
+    if (buffer->buffer == NULL) {
+        RETURN false;
+    }
 
-    RETURN;
+    RETURN true;
 }
 
 void DestroyFileBuffer (FileBuffer *buffer) {
@@ -37,44 +42,53 @@ static ssize_t GetFileSize (const char *filename) {
 
     struct stat file_statistics;
 
-    custom_assert (stat(filename, &file_statistics) == 0, cannot_open_file, 0);
+    if (stat(filename, &file_statistics) != 0) {
+        RETURN -1;
+    }
 
     RETURN file_statistics.st_size;
 }
 
-void ReadFile (const char *filename, FileBuffer *buffer) {
+bool ReadFile (const char *filename, FileBuffer *buffer) {
     PushLog (3);
 
-    custom_assert (filename != NULL,        pointer_is_null,     (void)0);
-    custom_assert (buffer   != NULL,        pointer_is_null,     (void)0);
-    custom_assert (buffer->buffer_size > 0, invalid_value,       (void)0);
+    custom_assert (filename != NULL,        pointer_is_null,     false);
+    custom_assert (buffer   != NULL,        pointer_is_null,     false);
+    custom_assert (buffer->buffer_size > 0, invalid_value,       false);
 
     int file_descriptor = -1;
 
-    custom_assert ((file_descriptor = open (filename, O_RDONLY)) != -1, cannot_open_file, (void)0);
+    if ((file_descriptor = open (filename, O_RDONLY)) == -1) {
+        RETURN false;
+    }
 
-    custom_assert (read (file_descriptor, buffer->buffer, (size_t) buffer->buffer_size) ==
-            buffer->buffer_size, cannot_open_file, (void)0);
+    if (read (file_descriptor, buffer->buffer, (size_t) buffer->buffer_size) != buffer->buffer_size) {
+        RETURN false;
+    }
 
-    custom_assert (close (file_descriptor) == 0, file_close_error, (void) 0);
+    if (close (file_descriptor) != 0) {
+        RETURN false;
+    }
 
-    RETURN;
+    RETURN true;
 }
 
-void ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *text_buffer) {
+bool ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *text_buffer) {
     PushLog (2);
 
-    custom_assert (file_buffer->buffer_size > 0, invalid_value,   (void)0);
-    custom_assert (file_buffer->buffer != NULL,  pointer_is_null, (void)0);
+    custom_assert (file_buffer->buffer_size > 0, invalid_value,   false);
+    custom_assert (file_buffer->buffer != NULL,  pointer_is_null, false);
 
-    ReadFile (filename,file_buffer);
+    if (!ReadFile (filename,file_buffer)) {
+        RETURN false;
+    }
 
     text_buffer->line_count = SplitBufferToLines (file_buffer->buffer, NULL);
     text_buffer->lines = (TextLine *) calloc (text_buffer->line_count, sizeof (TextLine));
 
     SplitBufferToLines (file_buffer->buffer, text_buffer);
 
-    RETURN;
+    RETURN true;
 }
 
 size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer) {
@@ -112,45 +126,49 @@ size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer) {
 
 }
 
-void WriteLine(int file_descriptor, TextLine *line) {
+bool WriteLine(int file_descriptor, TextLine *line) {
     PushLog (3);
 
-    custom_assert (line != NULL,        pointer_is_null, (void)0);
-    custom_assert (file_descriptor > 0, invalid_value,   (void)0);
+    custom_assert (line != NULL,        pointer_is_null, false);
+    custom_assert (file_descriptor > 0, invalid_value,   false);
 
     if (line->length == 0) {
-        RETURN;
+        RETURN true;
     }
 
     WriteBuffer (file_descriptor, line->pointer, (ssize_t) line->length);
     WriteBuffer (file_descriptor, "\n", 1);
 
-    RETURN;
+    RETURN true;
 }
 
-void WriteLines (int file_descriptor, TextBuffer *lines) {
+bool WriteLines (int file_descriptor, TextBuffer *lines) {
     PushLog (3);
 
-    custom_assert (lines != NULL,       pointer_is_null, (void)0);
-    custom_assert (file_descriptor > 0, invalid_value,   (void)0);
+    custom_assert (lines != NULL,       pointer_is_null, false);
+    custom_assert (file_descriptor > 0, invalid_value,   false);
 
     for (size_t line = 0; line < lines->line_count; line++) {
-        WriteLine (file_descriptor, lines->lines + line);
+        if (!WriteLine (file_descriptor, lines->lines + line)) {
+            RETURN false;
+        }
     }
 
-    RETURN;
+    RETURN true;
 }
 
-void WriteBuffer (int file_descriptor, const char *buffer, ssize_t buffer_size) {
+bool WriteBuffer (int file_descriptor, const char *buffer, ssize_t buffer_size) {
     PushLog (3);
 
-    custom_assert (buffer != NULL,      pointer_is_null, (void)0);
-    custom_assert (file_descriptor > 0, invalid_value,   (void)0);
-    custom_assert (buffer_size >= 0,    invalid_value,   (void)0);
+    custom_assert (buffer != NULL,      pointer_is_null, false);
+    custom_assert (file_descriptor > 0, invalid_value,   false);
+    custom_assert (buffer_size >= 0,    invalid_value,   false);
 
-    custom_assert (write (file_descriptor, buffer, (size_t)buffer_size) == buffer_size, cannot_open_file, (void)0);
+    if (write (file_descriptor, buffer, (size_t)buffer_size) != buffer_size) {
+        RETURN false;
+    }
 
-    RETURN;
+    RETURN true;
 }
 
 int OpenFileWrite (const char *filename) {
