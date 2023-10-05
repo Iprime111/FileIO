@@ -18,4 +18,6 @@ bool WriteLine   (int file_descriptor, TextLine *line);
 bool WriteLines  (int file_descriptor, TextBuffer *lines);
 bool WriteBuffer (int file_descriptor, const char *buffer, ssize_t buffer_size);
 
+int IsRegularFile (const char *path);
+
 #endif

@@ -202,3 +202,12 @@ static size_t LineLength (const char *line) {
 
     RETURN length;
 }
+
+int IsRegularFile (const char *path) {
+    struct stat stats;
+
+    if (stat(path, &stats) < 0)
+        return -1;
+
+    return S_ISREG(stats.st_mode);
+}
