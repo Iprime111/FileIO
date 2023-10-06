@@ -9,6 +9,7 @@
 #include "FileIO.h"
 #include "CustomAssert.h"
 #include "Logger.h"
+#include "TextTypes.h"
 
 static size_t LineLength (const char *line);
 static ssize_t GetFileSize (const char *filename);
@@ -124,6 +125,24 @@ size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer) {
 
     RETURN current_line_index;
 
+}
+
+bool ChangeNewLinesToZeroes (TextBuffer *buffer) {
+    PushLog (3);
+
+    custom_assert (buffer, pointer_is_null, false);
+
+    for (size_t lineIndex = 0; lineIndex < buffer->line_count; lineIndex++) {
+        char *lastElement = buffer->lines [lineIndex].pointer + buffer->lines [lineIndex].length;
+
+        if (!lastElement) {
+            RETURN false;
+        }
+
+        *(buffer->lines [lineIndex].pointer + buffer->lines [lineIndex].length) = '\0';
+    }
+
+    RETURN true;
 }
 
 bool WriteLine(int file_descriptor, TextLine *line) {

@@ -11,6 +11,8 @@ bool ReadFileLines  (const char *filename, FileBuffer *file_buffer, TextBuffer *
 
 size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer);
 
+bool ChangeNewLinesToZeroes (TextBuffer *buffer);
+
 int OpenFileWrite (const char *filename);
 void CloseFile (int file_descriptor);
 
