@@ -226,7 +226,7 @@ int IsRegularFile (const char *path) {
     struct stat stats;
 
     if (stat(path, &stats) < 0)
-        return -1;
+        return 0;
 
     return S_ISREG(stats.st_mode);
 }
