@@ -195,7 +195,7 @@ int OpenFileWrite (const char *filename) {
 
     int file_descriptor = -1;
 
-    custom_assert ((file_descriptor = open (filename, O_WRONLY | O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR)) != -1, cannot_open_file, -1);
+    custom_assert ((file_descriptor = open (filename, O_WRONLY | O_RDONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) != -1, cannot_open_file, -1);
 
     RETURN file_descriptor;
 }
