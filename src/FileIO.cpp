@@ -53,8 +53,8 @@ static ssize_t GetFileSize (const char *filename) {
 bool ReadFile (const char *filename, FileBuffer *buffer) {
     PushLog (3);
 
-    custom_assert (filename != NULL,        pointer_is_null,     false);
-    custom_assert (buffer   != NULL,        pointer_is_null,     false);
+    custom_assert (filename,                pointer_is_null,     false);
+    custom_assert (buffer,                  pointer_is_null,     false);
     custom_assert (buffer->buffer_size > 0, invalid_value,       false);
 
     int file_descriptor = -1;
@@ -78,7 +78,7 @@ bool ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *t
     PushLog (2);
 
     custom_assert (file_buffer->buffer_size > 0, invalid_value,   false);
-    custom_assert (file_buffer->buffer != NULL,  pointer_is_null, false);
+    custom_assert (file_buffer->buffer,          pointer_is_null, false);
 
     if (!ReadFile (filename,file_buffer)) {
         RETURN false;
@@ -95,7 +95,7 @@ bool ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *t
 size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer) {
     PushLog (3);
 
-    custom_assert (file_buffer != NULL, pointer_is_null, 0);
+    custom_assert (file_buffer, pointer_is_null, 0);
 
     char *current_symbol  = file_buffer;
     char *previous_symbol = NULL;
@@ -148,7 +148,7 @@ bool ChangeNewLinesToZeroes (TextBuffer *buffer) {
 bool WriteLine(int file_descriptor, TextLine *line) {
     PushLog (3);
 
-    custom_assert (line != NULL,        pointer_is_null, false);
+    custom_assert (line,                pointer_is_null, false);
     custom_assert (file_descriptor > 0, invalid_value,   false);
 
     if (line->length == 0) {
@@ -164,7 +164,7 @@ bool WriteLine(int file_descriptor, TextLine *line) {
 bool WriteLines (int file_descriptor, TextBuffer *lines) {
     PushLog (3);
 
-    custom_assert (lines != NULL,       pointer_is_null, false);
+    custom_assert (lines,               pointer_is_null, false);
     custom_assert (file_descriptor > 0, invalid_value,   false);
 
     for (size_t line = 0; line < lines->line_count; line++) {
@@ -179,7 +179,7 @@ bool WriteLines (int file_descriptor, TextBuffer *lines) {
 bool WriteBuffer (int file_descriptor, const char *buffer, ssize_t buffer_size) {
     PushLog (3);
 
-    custom_assert (buffer != NULL,      pointer_is_null, false);
+    custom_assert (buffer,              pointer_is_null, false);
     custom_assert (file_descriptor > 0, invalid_value,   false);
     custom_assert (buffer_size >= 0,    invalid_value,   false);
 
@@ -193,9 +193,9 @@ bool WriteBuffer (int file_descriptor, const char *buffer, ssize_t buffer_size) 
 int OpenFileWrite (const char *filename) {
     PushLog (3);
 
-    int file_descriptor = -1;
+    custom_assert (filename, pointer_is_null, -1);
 
-    custom_assert ((file_descriptor = open (filename, O_WRONLY | O_RDONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)) != -1, cannot_open_file, -1);
+    int file_descriptor = open (filename, O_WRONLY | O_RDONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 
     RETURN file_descriptor;
 }
@@ -203,7 +203,9 @@ int OpenFileWrite (const char *filename) {
 void CloseFile (int file_descriptor) {
     PushLog (4);
 
-    custom_assert (close (file_descriptor) == 0, file_close_error, (void) 0);
+    if (close (file_descriptor) == 0) {
+        custom_assert (0, file_close_error, (void) 0);
+    }
 
     RETURN;
 }
