@@ -203,7 +203,7 @@ int OpenFileWrite (const char *filename) {
 void CloseFile (int file_descriptor) {
     PushLog (4);
 
-    if (close (file_descriptor) == 0) {
+    if (close (file_descriptor) != 0) {
         custom_assert (0, file_close_error, (void) 0);
     }
 
