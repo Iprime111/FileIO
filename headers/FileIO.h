@@ -3,7 +3,7 @@
 
 #include "TextTypes.h"
 
-bool CreateFileBuffer  (FileBuffer *buffer, char *filename);
+bool CreateFileBuffer  (FileBuffer *buffer, const char *filename);
 void DestroyFileBuffer (FileBuffer *buffer);
 
 bool ReadFile       (const char *filename, FileBuffer *buffer);

@@ -14,7 +14,7 @@
 static size_t LineLength (const char *line);
 static ssize_t GetFileSize (const char *filename);
 
-bool CreateFileBuffer (FileBuffer *buffer, char *filename) {
+bool CreateFileBuffer (FileBuffer *buffer, const char *filename) {
     PushLog (3);
 
     buffer->buffer_size  = GetFileSize (filename);
