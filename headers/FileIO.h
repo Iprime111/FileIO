@@ -7,9 +7,9 @@ bool CreateFileBuffer  (FileBuffer *buffer, const char *filename);
 void DestroyFileBuffer (FileBuffer *buffer);
 
 bool ReadFile       (const char *filename, FileBuffer *buffer);
-bool ReadFileLines  (const char *filename, FileBuffer *file_buffer, TextBuffer *text_buffer);
+bool ReadFileLines  (const char *filename, FileBuffer *file_buffer, TextBuffer *text_buffer, char delim='\n');
 
-size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer);
+size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer, char delim='\n');
 
 bool ChangeNewLinesToZeroes (TextBuffer *buffer);
 

@@ -74,7 +74,7 @@ bool ReadFile (const char *filename, FileBuffer *buffer) {
     RETURN true;
 }
 
-bool ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *text_buffer) {
+bool ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *text_buffer, char delim) {
     PushLog (2);
 
     custom_assert (file_buffer->buffer_size > 0, invalid_value,   false);
@@ -92,7 +92,7 @@ bool ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *t
     RETURN true;
 }
 
-size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer) {
+size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer, char delim) {
     PushLog (3);
 
     custom_assert (file_buffer, pointer_is_null, 0);
@@ -110,7 +110,7 @@ size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer) {
             previous_symbol = current_symbol;
         }
 
-        if ((current_symbol = strchr (current_symbol, '\n')) == NULL)
+        if ((current_symbol = strchr (current_symbol, delim)) == NULL)
             break;
 
         current_line_index++;
