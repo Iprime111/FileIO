@@ -87,7 +87,7 @@ bool ReadFileLines (const char *filename, FileBuffer *file_buffer, TextBuffer *t
     text_buffer->line_count = SplitBufferToLines (file_buffer->buffer, NULL);
     text_buffer->lines = (TextLine *) calloc (text_buffer->line_count, sizeof (TextLine));
 
-    SplitBufferToLines (file_buffer->buffer, text_buffer);
+    SplitBufferToLines (file_buffer->buffer, text_buffer, delim);
 
     RETURN true;
 }
