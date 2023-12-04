@@ -219,7 +219,7 @@ static size_t LineLength (const char *line, const char delim) {
 
     size_t length = 0;
 
-    while (line [length] != '\0' && line [length] != delim) {
+    while (line [length] != '\0' && line [length] != '\n' && line [length] != delim) {
         length++;
     }
 
