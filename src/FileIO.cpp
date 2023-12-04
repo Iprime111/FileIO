@@ -11,7 +11,7 @@
 #include "Logger.h"
 #include "TextTypes.h"
 
-static size_t LineLength (const char *line);
+static size_t  LineLength  (const char *line, const char delim);
 static ssize_t GetFileSize (const char *filename);
 
 bool CreateFileBuffer (FileBuffer *buffer, const char *filename) {
@@ -118,7 +118,7 @@ size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer, char deli
     }
 
     if (text_buffer != NULL) {
-        text_buffer->lines[current_line_index - 1].length = LineLength (previous_symbol);
+        text_buffer->lines[current_line_index - 1].length = LineLength (previous_symbol, delim);
         text_buffer->line_count = current_line_index;
     }
 
@@ -210,14 +210,14 @@ void CloseFile (int file_descriptor) {
     RETURN;
 }
 
-static size_t LineLength (const char *line) {
+static size_t LineLength (const char *line, const char delim) {
     PushLog (4);
 
     custom_assert (line != NULL, pointer_is_null, 0);
 
     size_t length = 0;
 
-    while (line [length] != '\0' && line [length] != '\n') {
+    while (line [length] != '\0' && line [length] != delim) {
         length++;
     }
 
