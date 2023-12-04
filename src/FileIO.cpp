@@ -117,11 +117,13 @@ size_t SplitBufferToLines (char *file_buffer, TextBuffer *text_buffer, char deli
         current_symbol++;
     }
 
+    current_line_index++;
+
     if (text_buffer != NULL) {
-        text_buffer->lines[current_line_index].length = LineLength (previous_symbol, delim);
+        text_buffer->lines[current_line_index - 1].length = LineLength (previous_symbol, delim);
+        text_buffer->line_count = current_line_index;
     }
 
-    text_buffer->line_count = ++current_line_index;
 
     RETURN current_line_index;
 
